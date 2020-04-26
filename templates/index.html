@@ -261,8 +261,17 @@
 
     <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
     <script type="text/javascript">
-      username = {{ username }};
-      console.log(username);
+        {% for i in users %}
+            names = []
+            {% for key, value in i.items() %}
+                names.push({'{{ key }}':'{{ value }}'});
+            {% endfor %}
+        {% endfor %}
+
+      for(var i = 0; i < names.length; i++){
+          console.log(names[i].username)
+      }
+
       var data = {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         series: [
