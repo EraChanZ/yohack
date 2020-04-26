@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, jsonify, render_template, redirect
+from flask import request, jsonify, render_template, redirect, url_for
 import requests
 import json
 
@@ -44,8 +44,7 @@ def developmentnotification():
         if data['event'] == 'meeting.started':
             return redirect('/?active=True')
         elif data['event'] == 'meeting.participant_joined':
-    # Вот так выглядит: {'event': 'meeting.participant_joined', 'payload': {'account_id': 'IEtKIijwRsa80QH62ErZfQ', 'object': {'duration': 1984255313, 'start_time': '2020-04-26T11:18:28Z', 'timezone': '', 'topic': 'Хорошкольные Будни– Совещание Zoom', 'id': '73981412454', 'type': 1, 'uuid': '8Hk/lBv1QjW7LXkUKLhaDw==', 'participant': {'id': 'copqN_U3SHqrCqC2hwvIkQ', 'user_id': '16778240', 'user_name': 'Хорошкольные Будни', 'join_time': '2020-04-26T11:17:04Z'}, 'host_id': 'copqN_U3SHqrCqC2hwvIkQ'}}}
-            return redirect('/?username=' + data['payload']['object']['participant']['user_name'])
+            return redirect(url_for('/', username=data['payload']['object']['participant']['user_name'], active = True))
     return "..."
 
 
