@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, redirect
 import requests
 import json
 
@@ -10,10 +10,15 @@ userSessions = {}
 
 app = Flask(__name__)
 
+users = []
 
 @app.route('/', methods=['GET'])
 def main():
     global userSessions
+    active = False
+    username = request.args.get('username')
+    users.append({'username': username})
+    if request.args.get('active'): active = True
     if request.args.get('code'):
         print(request.args.get('code'))
         url = 'https://zoom.us/oauth/token?grant_type=authorization_code&code=' + request.args.get(
@@ -26,7 +31,10 @@ def main():
             token_ref = res['refresh_token']
             userSessions[clientID] = {'token': token, 'token_ref': token_ref}
             print(userSessions[clientID], 'i am here')
-    return render_template("index.html")
+    if active:
+        return render_template("index.html", username=users)
+    else:
+        return "Конференция не началась"
 
 
 @app.route('/developmentnotification', methods=['POST'])
@@ -34,11 +42,11 @@ def developmentnotification():
     data = request.json
     if 'event' in data:
         if data['event'] == 'meeting.started':
-            return render_template('index.html')
+            return redirect('/?active=True')
         elif data['event'] == 'meeting.participant_joined':
     # Вот так выглядит: {'event': 'meeting.participant_joined', 'payload': {'account_id': 'IEtKIijwRsa80QH62ErZfQ', 'object': {'duration': 1984255313, 'start_time': '2020-04-26T11:18:28Z', 'timezone': '', 'topic': 'Хорошкольные Будни– Совещание Zoom', 'id': '73981412454', 'type': 1, 'uuid': '8Hk/lBv1QjW7LXkUKLhaDw==', 'participant': {'id': 'copqN_U3SHqrCqC2hwvIkQ', 'user_id': '16778240', 'user_name': 'Хорошкольные Будни', 'join_time': '2020-04-26T11:17:04Z'}, 'host_id': 'copqN_U3SHqrCqC2hwvIkQ'}}}
-            return render_template('index.html', username=data['user name'])
-    return "5A6XsoFmQByZtMe-Z9jbyQ"
+            return redirect('/?username=' + data['payload']['object']['participant']['user_name'])
+    return "..."
 
 
 @app.route('/livestream', methods=['POST'])
