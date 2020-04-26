@@ -42,10 +42,9 @@ def developmentnotification():
     data = request.json
     if 'event' in data:
         if data['event'] == 'meeting.started':
-            return render_template("index.html")
+            return redirect('/?active=True')
         elif data['event'] == 'meeting.participant_joined':
-            users.append({'username': data['payload']['object']['participant']['user_name']})
-            return render_template("index.html", username=users)
+            return redirect(url_for('/', username=data['payload']['object']['participant']['user_name'], active = True))
     return "..."
 
 
